@@ -25,7 +25,7 @@ WORKDIR /app
 # OCI 标准元数据（用于 GHCR 显示）
 LABEL org.opencontainers.image.title="NovelCraft Backend"
 LABEL org.opencontainers.image.description="Fastify + Prisma + PostgreSQL backend for NovelCraft"
-LABEL org.opencontainers.image.source="https://github.com/${{ github.repository }}"
+LABEL org.opencontainers.image.source="https://github.com/novelcraft/novelcraft"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # 系统依赖
