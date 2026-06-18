@@ -22,26 +22,21 @@ COPY . .
 FROM node:20-alpine AS runtime
 WORKDIR /app
 
-# OCI 标准元数据（用于 GHCR 显示）
 LABEL org.opencontainers.image.title="NovelCraft Backend"
 LABEL org.opencontainers.image.description="Fastify + Prisma + PostgreSQL backend for NovelCraft"
 LABEL org.opencontainers.image.source="https://github.com/novelcraft/novelcraft"
 LABEL org.opencontainers.image.licenses="MIT"
 
-# 系统依赖
-RUN apk add --no-cache openssl dumb-init \
-    && addgroup -g 1000 novelcraft \
-    && adduser -u 1000 -G novelcraft -D novelcraft
+RUN apk add --no-cache openssl dumb-init && \
+    addgroup -g 1000 novelcraft && \
+    adduser -u 1000 -G novelcraft -D novelcraft
 
-# 只装生产依赖
 COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm ci --omit=dev && npx prisma generate && npm cache clean --force
 
-# 拷源码
 COPY --from=builder /app/src ./src
 
-# 上传目录
 RUN mkdir -p /app/files && chown -R novelcraft:novelcraft /app
 USER novelcraft
 
@@ -50,6 +45,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# 用 dumb-init 正确处理信号
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
