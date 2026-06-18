@@ -27,7 +27,7 @@ LABEL org.opencontainers.image.description="Fastify + Prisma + PostgreSQL backen
 LABEL org.opencontainers.image.source="https://github.com/novelcraft/novelcraft"
 LABEL org.opencontainers.image.licenses="MIT"
 
-RUN apk add --no-cache openssl dumb-init && \
+RUN apk add --no-cache openssl && \
     addgroup -g 1000 novelcraft && \
     adduser -u 1000 -G novelcraft -D novelcraft
 
@@ -45,5 +45,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-ENTRYPOINT ["dumb-init", "--"]
+# 直接用 sh 启动（dumb-init 不装，简化部署）
 CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
