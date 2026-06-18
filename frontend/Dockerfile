@@ -1,49 +1,22 @@
-# syntax=docker/dockerfile:1.7
-# 多架构支持：linux/amd64 + linux/arm64
-# 由 GitHub Actions 自动构建并推送到 GHCR
-
-# ---- 依赖缓存阶段 ----
-FROM node:20-alpine AS deps
+FROM node:20-alpine
 WORKDIR /app
+
 RUN apk add --no-cache openssl
+
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm ci --include=dev
+RUN npm install --omit=dev
 RUN npx prisma generate
 
-# ---- 构建阶段 ----
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/prisma ./prisma
 COPY . .
 
-# ---- 生产阶段 ----
-FROM node:20-alpine AS runtime
-WORKDIR /app
-
-LABEL org.opencontainers.image.title="NovelCraft Backend"
-LABEL org.opencontainers.image.description="Fastify + Prisma + PostgreSQL backend for NovelCraft"
-LABEL org.opencontainers.image.source="https://github.com/novelcraft/novelcraft"
-LABEL org.opencontainers.image.licenses="MIT"
-
-RUN apk add --no-cache openssl && \
-    addgroup -g 1000 novelcraft && \
-    adduser -u 1000 -G novelcraft -D novelcraft
-
-COPY package*.json ./
-COPY prisma ./prisma/
-RUN npm ci --omit=dev && npx prisma generate && npm cache clean --force
-
-COPY --from=builder /app/src ./src
-
-RUN mkdir -p /app/files && chown -R novelcraft:novelcraft /app
-USER novelcraft
+RUN addgroup -g 1000 nc && adduser -u 1000 -G nc -D nc
+RUN mkdir -p /app/files && chown -R nc:nc /app
+USER nc
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
 
-# 直接用 sh 启动（dumb-init 不装，简化部署）
 CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
