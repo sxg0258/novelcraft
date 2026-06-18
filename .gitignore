@@ -1,0 +1,14 @@
+# NovelCraft 根目录
+node_modules/
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+.env
+.env.local
+*.log
+.DS_Store
+
+# 运行时数据
+data/
+volumes/
