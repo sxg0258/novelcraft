@@ -21,7 +21,7 @@ WORKDIR /usr/share/nginx/html
 
 LABEL org.opencontainers.image.title="NovelCraft Frontend"
 LABEL org.opencontainers.image.description="Vue 3 + Tiptap SPA for NovelCraft"
-LABEL org.opencontainers.image.source="https://github.com/${{ github.repository }}"
+LABEL org.opencontainers.image.source="https://github.com/novelcraft/novelcraft"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # 拷贝构建产物
